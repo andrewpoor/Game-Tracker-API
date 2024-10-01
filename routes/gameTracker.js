@@ -1,5 +1,5 @@
 import express from "express";
-import * as controller from "../controllers/game-tracker.js"
+import * as controller from "../controllers/gameTracker.js"
 
 export const router = express.Router();
 

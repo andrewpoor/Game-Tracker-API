@@ -3,12 +3,13 @@ import express from "express";
 import "dotenv/config";
 
 //Import local middleware
-import { urlNotFound } from "./middleware/not-found.js";
+import { urlNotFound } from "./middleware/notFound.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 //Import routes
-import { router as trackerRouter } from "./routes/game-tracker.js"
-import { router as authRouter } from "./routes/authorisation.js"
+import { router as trackerRouter } from "./routes/gameTracker.js"
+import { router as authRouter } from "./routes/authentication.js"
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/v1/auth/", authRouter);
 
 //Error handling
 app.use(urlNotFound);
+app.use(errorHandler);
 
 //Setup
 app.listen(PORT, function() {
