@@ -20,7 +20,7 @@ export async function login(req, res) {
     }
 
     //User has successfully logged in. Create token to identify them.
-    const token = jwt.sign({username}, process.env.JWT_SECRET, {expiresIn: "7d"});
+    const token = createToken({username});
 
     return res.status(StatusCodes.OK).json({"token": token});
 }
@@ -34,6 +34,13 @@ export async function register(req, res) {
 
     storedUsername = username;
     storedPassHash = await bcrypt.hash(password, 10);
+
+    //User has successfully registered and is now logged-in. Create token to identify them.
+    const token = createToken({username});
     
-    return res.status(StatusCodes.OK).send(`${username} is registered!`);
+    return res.status(StatusCodes.OK).json({"token": token});
+}
+
+function createToken(payload) {
+    return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: "7d"});
 }
