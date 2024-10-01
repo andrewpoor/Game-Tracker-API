@@ -1,18 +1,21 @@
 import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
+import bcrypt from "bcryptjs"
 import { BadRequest, UnauthenticatedError } from "../errors/index.js";
 
-let storedUsername = "Alice";
-let storedPassword = "Password1";
+let storedUsername;
+let storedPassHash;
 
-export function login(req, res) {
+export async function login(req, res) {
     const { username, password } = req.body;
 
     if(!username || !password) {
         throw new BadRequest("Must include a username and password when logging in.");
     }
 
-    if(username != storedUsername || password != storedPassword) {
+    const isPassCorrect = await bcrypt.compare(password, storedPassHash);
+
+    if(username != storedUsername || !isPassCorrect) {
         throw new UnauthenticatedError("Username or password is not correct. Please try again.");
     }
 
@@ -22,7 +25,7 @@ export function login(req, res) {
     return res.status(StatusCodes.OK).json({"token": token});
 }
 
-export function register(req, res) {
+export async function register(req, res) {
     const { username, password } = req.body;
 
     if(!username || !password) {
@@ -30,7 +33,7 @@ export function register(req, res) {
     }
 
     storedUsername = username;
-    storedPassword = password;
+    storedPassHash = await bcrypt.hash(password, 10);
     
     return res.status(StatusCodes.OK).send(`${username} is registered!`);
 }

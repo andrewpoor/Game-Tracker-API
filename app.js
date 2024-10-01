@@ -1,6 +1,7 @@
 //Import third-party modules
 import express from "express";
 import "dotenv/config";
+import "express-async-errors";
 
 //Import local middleware
 import { urlNotFound } from "./middleware/notFound.js";
