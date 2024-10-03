@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes"
 
 export function getAllGames(req, res) {
-    const username = req.user.username;
-    return res.status(StatusCodes.OK).json(`Getting all games for ${username}!`);
+    const {name: username, id: userID} = req.user;
+    return res.status(StatusCodes.OK).json(`Getting all games for ${username} (ID: ${userID})!`);
 }
 
 export function trackNewGame(req, res) {

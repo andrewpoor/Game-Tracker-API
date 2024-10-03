@@ -2,6 +2,7 @@
 import express from "express";
 import "dotenv/config";
 import "express-async-errors";
+import mongoose from "mongoose";
 
 //Import local middleware
 import { urlNotFound } from "./middleware/notFound.js";
@@ -26,7 +27,16 @@ app.use("/api/v1/auth/", authRouter);
 app.use(urlNotFound);
 app.use(errorHandler);
 
-//Setup
-app.listen(PORT, function() {
-    console.log(`Server is now listening on port ${PORT}.`);
-});
+//Setup database and run the server.
+(async function start() {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+
+        app.listen(PORT, function() {
+            console.log(`Server is now listening on port ${PORT}.`);
+        });
+    } catch (error) {
+        //Could not connect to database. Shutdown without starting server.
+        console.log(error);
+    }
+})();

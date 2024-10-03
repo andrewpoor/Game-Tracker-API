@@ -18,7 +18,7 @@ export function authMiddleware(req, res, next) {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
     //Attach token payload to req for next middleware to use.
-    req.user = {username: payload.username};
+    req.user = {name: payload.username, id: payload.userID};
 
     return next();
 }
