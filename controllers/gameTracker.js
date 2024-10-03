@@ -1,22 +1,69 @@
 import { StatusCodes } from "http-status-codes"
+import { GameModel } from "../models/game.js";
+import { NotFoundError } from "../errors/notFoundError.js";
 
-export function getAllGames(req, res) {
-    const {name: username, id: userID} = req.user;
-    return res.status(StatusCodes.OK).json(`Getting all games for ${username} (ID: ${userID})!`);
+//This middleware should be behind an authorisation layer that retrieves the user details of the client.
+
+export async function getAllGames(req, res) {
+    const games = await GameModel.find({ userID: req.user.id }).
+        select('title console completed updatedAt').
+        sort('title');
+
+    return res.status(StatusCodes.OK).json({games});
 }
 
-export function trackNewGame(req, res) {
-    return res.status(StatusCodes.OK).json(`Creating a new game tracking entry for ${req.body.title}!`);
+export async function trackNewGame(req, res) {
+    const game = await GameModel.create({ userID: req.user.id, ...req.body });
+
+    return res.status(StatusCodes.CREATED).json({game});
 }
 
-export function getGame(req, res) {
-    return res.status(StatusCodes.OK).json("Getting a single game!");
+export async function getGame(req, res) {
+    const game = await GameModel.findOne({
+        _id: req.params.id,
+        userID: req.user.id
+    }).select('title console completed updatedAt');
+
+    if(!game) {
+        gameNotFound(req.params.id);
+    }
+
+    return res.status(StatusCodes.OK).json({game});
 }
 
-export function editGame(req, res) {
-    return res.status(StatusCodes.OK).json("Editing a game entry!");
+export async function editGame(req, res) {
+    const game = await GameModel.findOneAndUpdate(
+        {
+            _id: req.params.id,
+            userID: req.user.id
+        }, 
+        req.body,
+        {
+            new: true,
+            runValidators: true
+        }
+    ).select('title console completed updatedAt');
+
+    if(!game) {
+        gameNotFound(req.params.id);
+    }
+
+    return res.status(StatusCodes.OK).json({game});
 }
 
-export function deleteGame(req, res) {
-    return res.status(StatusCodes.OK).json("Deleting a game entry!");
+export async function deleteGame(req, res) {
+    const game = await GameModel.findOneAndDelete({
+        _id: req.params.id,
+        userID: req.user.id
+    });
+
+    if(!game) {
+        gameNotFound(req.params.id);
+    }
+
+    return res.status(StatusCodes.OK).send();
+}
+
+function gameNotFound(id) {
+    throw new NotFoundError(`No game found with id: ${id}.`);
 }

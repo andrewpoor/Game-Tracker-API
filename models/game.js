@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const GameSchema = new mongoose.Schema({
+    userID: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: [true, "Must be associated with a user."]
+    },
     title: {
         type: String,
         required: [true, "Must provide a game title."]
@@ -16,4 +21,4 @@ const GameSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-export const GameModel = mongoose.Model("Game", GameSchema);
+export const GameModel = mongoose.model("Game", GameSchema);
