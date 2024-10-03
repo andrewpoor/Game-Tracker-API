@@ -3,6 +3,10 @@ import express from "express";
 import "dotenv/config";
 import "express-async-errors";
 import mongoose from "mongoose";
+import helmet from "helmet";
+import cors from "cors";
+import xss from "xss-clean";
+import rateLimit from "express-rate-limit";
 
 //Import local middleware
 import { urlNotFound } from "./middleware/notFound.js";
@@ -15,6 +19,16 @@ import { router as authRouter } from "./routes/authentication.js"
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+//Security.
+app.set('trust proxy', 1); //For reverse proxy hosting.
+app.use(rateLimit({
+    max: 100, //Limits an IP to 100 requests per windowMs.
+    windowMs: 15 * 60 * 1000, //15 minutes.
+}));
+app.use(helmet());
+app.use(cors());
+app.use(xss());
 
 //Request parsing
 app.use(express.json());
