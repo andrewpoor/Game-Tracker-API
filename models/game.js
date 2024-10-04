@@ -19,6 +19,6 @@ const GameSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 export const GameModel = mongoose.model("Game", GameSchema);

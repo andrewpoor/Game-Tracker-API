@@ -16,7 +16,7 @@ export function errorHandler(err, req, res, next) {
         //Join together each validation error message.
         msg = Object.values(err.errors).
             map((error) => error.message).
-            join(', ');
+            join(" | ");
     } else if(err.name === 'CastError') {
         //Typically indicates a provided ID doesn't exist in the database.
         code = StatusCodes.NOT_FOUND;
